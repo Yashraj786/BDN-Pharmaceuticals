@@ -1,0 +1,41 @@
+<div class="flex items-center justify-between mb-6">
+  <h1 class="text-3xl font-black">👥 Customers</h1>
+  <%= link_to "+ Add Customer", new_customer_path, class: "bg-blue-600 hover:bg-blue-700 text-white font-bold px-5 py-3 rounded-lg text-xl" %>
+</div>
+
+<div class="bg-white rounded-2xl shadow overflow-hidden">
+  <table class="w-full">
+    <thead class="bg-gray-100">
+      <tr>
+        <th class="px-5 py-4 text-left text-lg font-bold">Name</th>
+        <th class="px-5 py-4 text-left text-lg font-bold">Phone</th>
+        <th class="px-5 py-4 text-left text-lg font-bold">City</th>
+        <th class="px-5 py-4 text-left text-lg font-bold">Total Spent</th>
+        <th class="px-5 py-4 text-left text-lg font-bold">Outstanding</th>
+        <th class="px-5 py-4 text-left text-lg font-bold">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @customers.each_with_index do |c, i| %>
+        <tr class="border-t <%= i.even? ? 'bg-white' : 'bg-gray-50' %> hover:bg-blue-50">
+          <td class="px-5 py-4 text-lg font-semibold"><%= c.customer_name %></td>
+          <td class="px-5 py-4 text-lg">📞 <%= c.phone %></td>
+          <td class="px-5 py-4 text-lg"><%= c.city %></td>
+          <td class="px-5 py-4 text-lg font-bold text-green-700">₹<%= number_with_delimiter(c.total_spent.to_f.round(0)) %></td>
+          <td class="px-5 py-4 text-lg <%= c.outstanding_amount.to_f > 0 ? 'text-red-700 font-bold' : 'text-gray-400' %>">
+            ₹<%= number_with_delimiter(c.outstanding_amount.to_f.round(0)) %>
+          </td>
+          <td class="px-5 py-4">
+            <div class="flex gap-2">
+              <%= link_to "View History", customer_path(c), class: "bg-blue-500 hover:bg-blue-600 text-white font-bold px-4 py-2 rounded-lg text-base" %>
+              <%= link_to "Edit", edit_customer_path(c), class: "bg-gray-500 hover:bg-gray-600 text-white font-bold px-4 py-2 rounded-lg text-base" %>
+            </div>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+  <% if @customers.empty? %>
+    <div class="p-10 text-center text-xl text-gray-500">No customers yet.</div>
+  <% end %>
+</div>

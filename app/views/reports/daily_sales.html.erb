@@ -1,0 +1,53 @@
+<div class="flex items-center justify-between mb-6">
+  <h1 class="text-3xl font-black">🛒 Daily Sales Report</h1>
+  <%= form_with url: report_daily_sales_path, method: :get, local: true, class: "flex gap-3 items-center" do |f| %>
+    <%= f.date_field :date, value: @date, class: "text-xl p-3 border-2 border-gray-300 rounded-lg" %>
+    <%= f.submit "Load", class: "bg-blue-600 text-white font-bold px-5 py-3 rounded-lg cursor-pointer" %>
+  <% end %>
+</div>
+<p class="text-2xl font-bold text-blue-700 mb-4"><%= @date.strftime("%A, %d %B %Y") %></p>
+
+<div class="grid grid-cols-2 gap-4 mb-6">
+  <div class="bg-green-50 border-2 border-green-400 rounded-xl p-4">
+    <p class="text-lg text-gray-600">Total Orders</p>
+    <p class="text-4xl font-black text-green-700"><%= @orders.count %></p>
+  </div>
+  <div class="bg-blue-50 border-2 border-blue-400 rounded-xl p-4">
+    <p class="text-lg text-gray-600">Total Received</p>
+    <p class="text-4xl font-black text-blue-700">₹<%= number_with_delimiter(@paid.to_f.round(0)) %></p>
+  </div>
+</div>
+
+<div class="bg-white rounded-2xl shadow overflow-hidden mb-6">
+  <table class="w-full">
+    <thead class="bg-gray-100">
+      <tr>
+        <th class="px-5 py-3 text-left text-lg font-bold">Customer</th>
+        <th class="px-5 py-3 text-left text-lg font-bold">Product</th>
+        <th class="px-5 py-3 text-left text-lg font-bold">Qty</th>
+        <th class="px-5 py-3 text-left text-lg font-bold">Total</th>
+        <th class="px-5 py-3 text-left text-lg font-bold">Paid</th>
+        <th class="px-5 py-3 text-left text-lg font-bold">Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @orders.each_with_index do |o, i| %>
+        <tr class="border-t <%= i.even? ? 'bg-white' : 'bg-gray-50' %>">
+          <td class="px-5 py-3 text-lg"><%= o.customer_name %></td>
+          <td class="px-5 py-3 text-lg"><%= o.product_name %></td>
+          <td class="px-5 py-3 text-lg"><%= o.quantity_ordered_liters.to_f.round(0) %> L</td>
+          <td class="px-5 py-3 text-lg font-bold">₹<%= number_with_delimiter(o.total_amount.to_f.round(0)) %></td>
+          <td class="px-5 py-3 text-lg text-green-700">₹<%= number_with_delimiter(o.amount_paid.to_f.round(0)) %></td>
+          <td class="px-5 py-3"><%= status_badge(o.payment_status) %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+  <% if @orders.empty? %>
+    <div class="p-10 text-center text-xl text-gray-500">No sales for this date.</div>
+  <% end %>
+</div>
+<div class="flex gap-4">
+  <%= link_to "← Back to Reports", reports_path, class: "bg-gray-500 text-white font-bold px-6 py-3 rounded-lg text-lg" %>
+  <button onclick="window.print()" class="bg-blue-600 text-white font-bold px-6 py-3 rounded-lg text-lg">🖨️ Print</button>
+</div>

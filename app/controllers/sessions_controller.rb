@@ -1,0 +1,22 @@
+class SessionsController < ApplicationController
+  skip_before_action :require_login
+
+  def new; end
+
+  def create
+    user = User.find_by(email: params[:email])
+    if user&.authenticate(params[:password])
+      session[:user_id] = user.id
+      session[:expires_at] = 60.days.from_now
+      redirect_to dashboard_path, notice: "Welcome back, #{user.name}!"
+    else
+      flash.now[:alert] = "Wrong email or password. Please try again."
+      render :new, status: :unprocessable_entity
+    end
+  end
+
+  def destroy
+    session[:user_id] = nil
+    redirect_to login_path, notice: "You have been logged out."
+  end
+end

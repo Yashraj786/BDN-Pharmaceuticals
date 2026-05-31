@@ -1,0 +1,70 @@
+<div class="max-w-3xl mx-auto">
+  <div class="flex items-center justify-between mb-6">
+    <h1 class="text-3xl font-black">👤 <%= @customer.customer_name %></h1>
+    <div class="flex gap-3">
+      <%= link_to "Edit", edit_customer_path(@customer), class: "bg-blue-600 text-white font-bold px-5 py-2 rounded-lg" %>
+      <%= link_to "← Back", customers_path, class: "bg-gray-500 text-white font-bold px-5 py-2 rounded-lg" %>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-2 gap-4 mb-6">
+    <div class="bg-white rounded-xl shadow p-4">
+      <p class="text-sm text-gray-500">Phone</p>
+      <p class="text-2xl font-bold">📞 <%= @customer.phone %></p>
+    </div>
+    <div class="bg-white rounded-xl shadow p-4">
+      <p class="text-sm text-gray-500">City</p>
+      <p class="text-2xl font-bold"><%= @customer.city.presence || "—" %></p>
+    </div>
+    <div class="bg-green-50 rounded-xl shadow p-4">
+      <p class="text-sm text-gray-500">Total Spent (All Time)</p>
+      <p class="text-2xl font-bold text-green-700">₹<%= number_with_delimiter(@customer.total_spent.to_f.round(0)) %></p>
+    </div>
+    <div class="<%= @customer.outstanding_amount.to_f > 0 ? 'bg-red-50' : 'bg-gray-50' %> rounded-xl shadow p-4">
+      <p class="text-sm text-gray-500">Outstanding Balance</p>
+      <p class="text-2xl font-bold <%= @customer.outstanding_amount.to_f > 0 ? 'text-red-700' : 'text-gray-500' %>">
+        ₹<%= number_with_delimiter(@customer.outstanding_amount.to_f.round(0)) %>
+      </p>
+    </div>
+  </div>
+  <% if @customer.address.present? %>
+    <div class="bg-white rounded-xl shadow p-4 mb-6">
+      <p class="text-sm text-gray-500">Address</p>
+      <p class="text-xl"><%= @customer.address %></p>
+    </div>
+  <% end %>
+
+  <div class="bg-white rounded-2xl shadow">
+    <div class="px-6 py-4 border-b flex items-center justify-between">
+      <h2 class="text-2xl font-bold">Order History</h2>
+      <%= link_to "+ New Sale for this Customer", new_sales_order_path, class: "bg-green-600 text-white font-bold px-4 py-2 rounded-lg" %>
+    </div>
+    <table class="w-full">
+      <thead class="bg-gray-100">
+        <tr>
+          <th class="px-5 py-3 text-left text-lg font-bold">Date</th>
+          <th class="px-5 py-3 text-left text-lg font-bold">Product</th>
+          <th class="px-5 py-3 text-left text-lg font-bold">Qty</th>
+          <th class="px-5 py-3 text-left text-lg font-bold">Total</th>
+          <th class="px-5 py-3 text-left text-lg font-bold">Paid</th>
+          <th class="px-5 py-3 text-left text-lg font-bold">Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @orders.each_with_index do |o, i| %>
+          <tr class="border-t <%= i.even? ? 'bg-white' : 'bg-gray-50' %>">
+            <td class="px-5 py-3 text-lg"><%= o.order_date&.strftime("%d %b %Y") %></td>
+            <td class="px-5 py-3 text-lg"><%= o.product_name %></td>
+            <td class="px-5 py-3 text-lg"><%= o.quantity_ordered_liters.to_f.round(0) %> L</td>
+            <td class="px-5 py-3 text-lg font-bold">₹<%= number_with_delimiter(o.total_amount.to_f.round(0)) %></td>
+            <td class="px-5 py-3 text-lg text-green-700">₹<%= number_with_delimiter(o.amount_paid.to_f.round(0)) %></td>
+            <td class="px-5 py-3"><%= status_badge(o.payment_status) %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+    <% if @orders.empty? %>
+      <div class="p-8 text-center text-xl text-gray-500">No orders yet.</div>
+    <% end %>
+  </div>
+</div>

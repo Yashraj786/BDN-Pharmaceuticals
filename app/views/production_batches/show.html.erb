@@ -1,0 +1,68 @@
+<div class="max-w-3xl mx-auto">
+  <div class="flex items-center justify-between mb-6">
+    <h1 class="text-3xl font-black">🏭 <%= @batch.batch_name %></h1>
+    <div class="flex gap-3">
+      <%= link_to "Edit", edit_production_batch_path(@batch), class: "bg-blue-600 text-white font-bold px-5 py-2 rounded-lg" %>
+      <%= link_to "← Back", production_batches_path, class: "bg-gray-500 text-white font-bold px-5 py-2 rounded-lg" %>
+    </div>
+  </div>
+
+  <div class="bg-white rounded-2xl shadow p-6 space-y-4 mb-6">
+    <div class="grid grid-cols-2 gap-4">
+      <div class="bg-gray-50 p-4 rounded-xl">
+        <p class="text-base text-gray-500">Product</p>
+        <p class="text-2xl font-bold"><%= @batch.product_name %></p>
+      </div>
+      <div class="bg-gray-50 p-4 rounded-xl">
+        <p class="text-base text-gray-500">Date</p>
+        <p class="text-2xl font-bold"><%= @batch.batch_date&.strftime("%d %b %Y") %></p>
+      </div>
+      <div class="bg-gray-50 p-4 rounded-xl">
+        <p class="text-base text-gray-500">Quantity</p>
+        <p class="text-2xl font-bold"><%= @batch.quantity_produced_liters %> Liters</p>
+      </div>
+      <div class="bg-gray-50 p-4 rounded-xl">
+        <p class="text-base text-gray-500">Production Cost</p>
+        <p class="text-2xl font-bold">₹<%= number_with_delimiter(@batch.production_cost.to_f.round(0)) %></p>
+      </div>
+      <div class="bg-gray-50 p-4 rounded-xl">
+        <p class="text-base text-gray-500">Expected Sale/Liter</p>
+        <p class="text-2xl font-bold">₹<%= @batch.expected_sale_price %></p>
+      </div>
+      <div class="<%= @batch.profit >= 0 ? 'bg-green-50' : 'bg-red-50' %> p-4 rounded-xl">
+        <p class="text-base text-gray-500">Expected Profit</p>
+        <p class="text-2xl font-bold <%= @batch.profit >= 0 ? 'text-green-700' : 'text-red-700' %>">
+          ₹<%= number_with_delimiter(@batch.profit.round(0)) %>
+        </p>
+      </div>
+    </div>
+
+    <div class="bg-gray-50 p-4 rounded-xl">
+      <p class="text-base text-gray-500">Status</p>
+      <%= status_badge(@batch.batch_status) %>
+    </div>
+  </div>
+
+  <% if @batch.quality_log %>
+    <div class="bg-white rounded-2xl shadow p-6">
+      <h2 class="text-2xl font-bold mb-4">🔬 Quality Check Result</h2>
+      <p class="text-xl"><strong>Purity Test:</strong>
+        <span class="<%= @batch.quality_log.purity_test == 'pass' ? 'text-green-700' : 'text-red-700' %> font-bold text-2xl">
+          <%= @batch.quality_log.purity_test == "pass" ? "✅ PASSED" : "❌ FAILED" %>
+        </span>
+      </p>
+      <p class="text-xl mt-2"><strong>Color OK:</strong> <%= @batch.quality_log.color_ok ? "✅ Yes" : "❌ No" %></p>
+      <p class="text-xl mt-2"><strong>Smell OK:</strong> <%= @batch.quality_log.smell_ok ? "✅ Yes" : "❌ No" %></p>
+      <% if @batch.quality_log.notes.present? %>
+        <p class="text-xl mt-2"><strong>Notes:</strong> <%= @batch.quality_log.notes %></p>
+      <% end %>
+      <p class="text-lg text-gray-500 mt-2">Checked by: <%= @batch.quality_log.checked_by %> on <%= @batch.quality_log.checked_date&.strftime("%d %b %Y") %></p>
+    </div>
+  <% elsif @batch.batch_status == "completed" %>
+    <div class="bg-yellow-50 border-2 border-yellow-400 rounded-2xl p-6">
+      <p class="text-xl font-bold text-yellow-800 mb-4">🔬 Quality check not done yet!</p>
+      <%= link_to "DO QUALITY CHECK NOW →", new_production_batch_quality_log_path(@batch),
+          class: "bg-purple-600 hover:bg-purple-700 text-white font-bold px-6 py-3 rounded-xl text-xl" %>
+    </div>
+  <% end %>
+</div>

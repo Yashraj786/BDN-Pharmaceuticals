@@ -1,0 +1,64 @@
+<h1 class="text-3xl font-black mb-6">🔬 Quality Control</h1>
+
+<!-- PENDING CHECKS -->
+<% if @pending.any? %>
+  <div class="bg-yellow-50 border-2 border-yellow-400 rounded-2xl p-6 mb-8">
+    <h2 class="text-2xl font-bold text-yellow-800 mb-4">⏳ Waiting for Quality Check (<%= @pending.count %>)</h2>
+    <div class="space-y-3">
+      <% @pending.each do |batch| %>
+        <div class="bg-white rounded-xl p-4 flex items-center justify-between border border-yellow-200">
+          <div>
+            <p class="text-xl font-bold"><%= batch.batch_name %></p>
+            <p class="text-lg text-gray-600"><%= batch.product_name %> · <%= batch.quantity_produced_liters %> L · <%= batch.batch_date&.strftime("%d %b") %></p>
+          </div>
+          <%= link_to "🔬 CHECK NOW", new_production_batch_quality_log_path(batch),
+              class: "bg-purple-600 hover:bg-purple-700 text-white font-bold px-6 py-3 rounded-xl text-lg" %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+<% else %>
+  <div class="bg-green-100 border-2 border-green-400 rounded-2xl p-6 mb-8 text-xl font-bold text-green-800">
+    ✅ No pending quality checks! All batches are checked.
+  </div>
+<% end %>
+
+<!-- COMPLETED CHECKS -->
+<div class="bg-white rounded-2xl shadow">
+  <div class="px-6 py-4 border-b">
+    <h2 class="text-2xl font-bold">Recent Quality Check Results</h2>
+  </div>
+  <table class="w-full">
+    <thead class="bg-gray-100">
+      <tr>
+        <th class="px-5 py-4 text-left text-lg font-bold">Batch</th>
+        <th class="px-5 py-4 text-left text-lg font-bold">Product</th>
+        <th class="px-5 py-4 text-left text-lg font-bold">Check Date</th>
+        <th class="px-5 py-4 text-left text-lg font-bold">Purity Test</th>
+        <th class="px-5 py-4 text-left text-lg font-bold">Color</th>
+        <th class="px-5 py-4 text-left text-lg font-bold">Smell</th>
+        <th class="px-5 py-4 text-left text-lg font-bold">Checked By</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @checked.each_with_index do |log, i| %>
+        <tr class="border-t <%= i.even? ? 'bg-white' : 'bg-gray-50' %>">
+          <td class="px-5 py-4 text-lg font-bold"><%= log.production_batch.batch_name %></td>
+          <td class="px-5 py-4 text-lg"><%= log.production_batch.product_name %></td>
+          <td class="px-5 py-4 text-lg"><%= log.checked_date&.strftime("%d %b %Y") %></td>
+          <td class="px-5 py-4">
+            <span class="<%= log.purity_test == 'pass' ? 'text-green-700' : 'text-red-700' %> font-bold text-lg">
+              <%= log.purity_test == "pass" ? "✅ PASS" : "❌ FAIL" %>
+            </span>
+          </td>
+          <td class="px-5 py-4 text-lg"><%= log.color_ok ? "✅" : "❌" %></td>
+          <td class="px-5 py-4 text-lg"><%= log.smell_ok ? "✅" : "❌" %></td>
+          <td class="px-5 py-4 text-lg"><%= log.checked_by %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+  <% if @checked.empty? %>
+    <div class="p-10 text-center text-xl text-gray-500">No quality checks done yet.</div>
+  <% end %>
+</div>

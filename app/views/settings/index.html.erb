@@ -1,0 +1,63 @@
+<h1 class="text-3xl font-black mb-8">⚙️ Settings (Admin Only)</h1>
+
+<!-- CHANGE PASSWORD -->
+<div class="bg-white rounded-2xl shadow p-6 mb-6 max-w-xl">
+  <h2 class="text-2xl font-bold mb-4">🔑 Change Password</h2>
+  <%= form_with url: change_password_setting_path, method: :post, local: true, class: "space-y-4" do |f| %>
+    <div>
+      <label class="block text-xl font-semibold mb-2">Current Password</label>
+      <%= f.password_field :current_password, class: "w-full text-xl p-4 border-2 border-gray-300 rounded-xl focus:border-blue-500 focus:outline-none" %>
+    </div>
+    <div>
+      <label class="block text-xl font-semibold mb-2">New Password (min 4 characters)</label>
+      <%= f.password_field :new_password, class: "w-full text-xl p-4 border-2 border-gray-300 rounded-xl focus:border-blue-500 focus:outline-none" %>
+    </div>
+    <div>
+      <label class="block text-xl font-semibold mb-2">Confirm New Password</label>
+      <%= f.password_field :new_password_confirmation, class: "w-full text-xl p-4 border-2 border-gray-300 rounded-xl focus:border-blue-500 focus:outline-none" %>
+    </div>
+    <%= f.submit "CHANGE PASSWORD", class: "w-full bg-blue-600 hover:bg-blue-700 text-white text-xl font-bold py-4 rounded-xl cursor-pointer" %>
+  <% end %>
+</div>
+
+<!-- USER MANAGEMENT -->
+<div class="bg-white rounded-2xl shadow p-6 mb-6">
+  <div class="flex items-center justify-between mb-4">
+    <h2 class="text-2xl font-bold">👥 User Management</h2>
+    <%= link_to "+ Add User", new_user_setting_path, class: "bg-blue-600 text-white font-bold px-5 py-2 rounded-lg text-lg" %>
+  </div>
+  <table class="w-full">
+    <thead class="bg-gray-100">
+      <tr>
+        <th class="px-5 py-3 text-left text-lg font-bold">Name</th>
+        <th class="px-5 py-3 text-left text-lg font-bold">Email</th>
+        <th class="px-5 py-3 text-left text-lg font-bold">Role</th>
+        <th class="px-5 py-3 text-left text-lg font-bold">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @users.each_with_index do |u, i| %>
+        <tr class="border-t <%= i.even? ? 'bg-white' : 'bg-gray-50' %>">
+          <td class="px-5 py-3 text-lg"><%= u.name %></td>
+          <td class="px-5 py-3 text-lg"><%= u.email %></td>
+          <td class="px-5 py-3 text-lg"><span class="bg-blue-100 text-blue-800 px-2 py-1 rounded font-bold"><%= u.role.humanize %></span></td>
+          <td class="px-5 py-3">
+            <% unless u == current_user %>
+              <%= button_to "Remove", destroy_user_setting_path(u.id), method: :delete,
+                  data: { confirm: "Remove user #{u.name}?" },
+                  class: "bg-red-500 hover:bg-red-600 text-white font-bold px-4 py-2 rounded-lg text-base" %>
+            <% end %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>
+
+<!-- BACKUP -->
+<div class="bg-white rounded-2xl shadow p-6 max-w-xl">
+  <h2 class="text-2xl font-bold mb-4">💾 Data Backup</h2>
+  <p class="text-lg text-gray-600 mb-4">Download all your data as a JSON backup file.</p>
+  <%= link_to "⬇️ DOWNLOAD BACKUP NOW", report_backup_path,
+      class: "block w-full bg-gray-700 hover:bg-gray-800 text-white text-xl font-bold py-4 rounded-xl text-center" %>
+</div>

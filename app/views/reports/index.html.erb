@@ -1,0 +1,112 @@
+<div class="flex items-center justify-between mb-6 flex-wrap gap-4">
+  <h1 class="text-3xl font-black">📊 Monthly Finance Report</h1>
+  <div class="flex gap-3 flex-wrap">
+    <%= form_with url: reports_path, method: :get, local: true, class: "flex gap-3 items-center" do |f| %>
+      <%= f.month_field :month, value: @month.strftime("%Y-%m"), class: "text-xl p-3 border-2 border-gray-300 rounded-lg" %>
+      <%= f.submit "Load Month", class: "bg-blue-600 hover:bg-blue-700 text-white font-bold px-5 py-3 rounded-lg text-lg cursor-pointer" %>
+    <% end %>
+    <%= link_to "🔽 Download Backup", report_backup_path, class: "bg-gray-600 hover:bg-gray-700 text-white font-bold px-5 py-3 rounded-lg text-lg" %>
+  </div>
+</div>
+
+<p class="text-2xl font-bold text-gray-700 mb-6">Report for: <span class="text-blue-700"><%= @month.strftime("%B %Y") %></span></p>
+
+<!-- BIG SUMMARY CARDS -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+  <div class="bg-green-50 border-4 border-green-400 rounded-2xl p-6 text-center">
+    <h2 class="text-xl font-bold text-green-900 mb-2">💰 Total Revenue</h2>
+    <p class="text-5xl font-black text-green-700">₹<%= number_with_delimiter(@revenue.round(0)) %></p>
+    <p class="text-lg text-gray-600 mt-2">Money received from sales</p>
+  </div>
+  <div class="bg-red-50 border-4 border-red-400 rounded-2xl p-6 text-center">
+    <h2 class="text-xl font-bold text-red-900 mb-2">💸 Total Expenses</h2>
+    <p class="text-5xl font-black text-red-700">₹<%= number_with_delimiter(@expenses.round(0)) %></p>
+    <p class="text-lg text-gray-600 mt-2">All expenses this month</p>
+  </div>
+  <div class="<%= @net_profit >= 0 ? 'bg-blue-50 border-blue-400' : 'bg-red-50 border-red-400' %> border-4 rounded-2xl p-6 text-center">
+    <h2 class="text-xl font-bold text-gray-900 mb-2">📈 Net Profit</h2>
+    <p class="text-5xl font-black <%= @net_profit >= 0 ? 'text-blue-700' : 'text-red-700' %>">
+      ₹<%= number_with_delimiter(@net_profit.round(0)) %>
+    </p>
+    <p class="text-lg text-gray-600 mt-2">Revenue − Expenses</p>
+    <p class="text-xl font-bold <%= @net_profit >= 0 ? 'text-green-600' : 'text-red-600' %> mt-1">
+      <%= @net_profit >= 0 ? "✅ PROFIT" : "❌ LOSS" %>
+    </p>
+  </div>
+</div>
+
+<!-- OTHER QUICK REPORTS -->
+<div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+  <%= link_to report_daily_production_path, class: "bg-yellow-50 border-2 border-yellow-400 rounded-xl p-5 text-center hover:bg-yellow-100 block" do %>
+    <p class="text-4xl mb-2">🏭</p>
+    <p class="text-xl font-bold">Daily Production Report</p>
+  <% end %>
+  <%= link_to report_daily_sales_path, class: "bg-green-50 border-2 border-green-400 rounded-xl p-5 text-center hover:bg-green-100 block" do %>
+    <p class="text-4xl mb-2">🛒</p>
+    <p class="text-xl font-bold">Daily Sales Report</p>
+  <% end %>
+  <%= link_to report_inventory_path, class: "bg-purple-50 border-2 border-purple-400 rounded-xl p-5 text-center hover:bg-purple-100 block" do %>
+    <p class="text-4xl mb-2">📦</p>
+    <p class="text-xl font-bold">Inventory Report</p>
+  <% end %>
+  <%= link_to report_customer_credit_path, class: "bg-red-50 border-2 border-red-400 rounded-xl p-5 text-center hover:bg-red-100 block" do %>
+    <p class="text-4xl mb-2">💰</p>
+    <p class="text-xl font-bold">Customer Credit Report</p>
+  <% end %>
+</div>
+
+<!-- SALES DETAIL -->
+<div class="bg-white rounded-2xl shadow mb-6">
+  <div class="px-6 py-4 border-b"><h2 class="text-2xl font-bold">Sales This Month (<%= @orders.count %> orders)</h2></div>
+  <table class="w-full">
+    <thead class="bg-gray-100">
+      <tr>
+        <th class="px-5 py-3 text-left text-lg font-bold">Date</th>
+        <th class="px-5 py-3 text-left text-lg font-bold">Customer</th>
+        <th class="px-5 py-3 text-left text-lg font-bold">Product</th>
+        <th class="px-5 py-3 text-left text-lg font-bold">Qty</th>
+        <th class="px-5 py-3 text-left text-lg font-bold">Total</th>
+        <th class="px-5 py-3 text-left text-lg font-bold">Paid</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @orders.each_with_index do |o, i| %>
+        <tr class="border-t <%= i.even? ? 'bg-white' : 'bg-gray-50' %>">
+          <td class="px-5 py-3 text-lg"><%= o.order_date&.strftime("%d %b") %></td>
+          <td class="px-5 py-3 text-lg"><%= o.customer_name %></td>
+          <td class="px-5 py-3 text-lg"><%= o.product_name %></td>
+          <td class="px-5 py-3 text-lg"><%= o.quantity_ordered_liters.to_f.round(0) %> L</td>
+          <td class="px-5 py-3 text-lg font-bold">₹<%= number_with_delimiter(o.total_amount.to_f.round(0)) %></td>
+          <td class="px-5 py-3 text-lg text-green-700">₹<%= number_with_delimiter(o.amount_paid.to_f.round(0)) %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+  <% if @orders.empty? %><div class="p-8 text-center text-xl text-gray-500">No sales this month.</div><% end %>
+</div>
+
+<!-- EXPENSES DETAIL -->
+<div class="bg-white rounded-2xl shadow">
+  <div class="px-6 py-4 border-b"><h2 class="text-2xl font-bold">Expenses This Month (<%= @expense_list.count %>)</h2></div>
+  <table class="w-full">
+    <thead class="bg-gray-100">
+      <tr>
+        <th class="px-5 py-3 text-left text-lg font-bold">Date</th>
+        <th class="px-5 py-3 text-left text-lg font-bold">Type</th>
+        <th class="px-5 py-3 text-left text-lg font-bold">Amount</th>
+        <th class="px-5 py-3 text-left text-lg font-bold">Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @expense_list.each_with_index do |e, i| %>
+        <tr class="border-t <%= i.even? ? 'bg-white' : 'bg-gray-50' %>">
+          <td class="px-5 py-3 text-lg"><%= e.expense_date&.strftime("%d %b") %></td>
+          <td class="px-5 py-3 text-lg"><%= e.type_label %></td>
+          <td class="px-5 py-3 text-lg font-bold text-red-700">₹<%= number_with_delimiter(e.amount.to_f.round(0)) %></td>
+          <td class="px-5 py-3 text-lg"><%= e.description.to_s.truncate(60) %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+  <% if @expense_list.empty? %><div class="p-8 text-center text-xl text-gray-500">No expenses this month.</div><% end %>
+</div>

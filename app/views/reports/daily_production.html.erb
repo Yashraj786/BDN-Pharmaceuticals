@@ -1,0 +1,40 @@
+<div class="flex items-center justify-between mb-6">
+  <h1 class="text-3xl font-black">🏭 Daily Production Report</h1>
+  <%= form_with url: report_daily_production_path, method: :get, local: true, class: "flex gap-3 items-center" do |f| %>
+    <%= f.date_field :date, value: @date, class: "text-xl p-3 border-2 border-gray-300 rounded-lg" %>
+    <%= f.submit "Load", class: "bg-blue-600 text-white font-bold px-5 py-3 rounded-lg cursor-pointer" %>
+  <% end %>
+</div>
+<p class="text-2xl font-bold text-blue-700 mb-6"><%= @date.strftime("%A, %d %B %Y") %></p>
+
+<div class="bg-white rounded-2xl shadow overflow-hidden mb-6">
+  <table class="w-full">
+    <thead class="bg-gray-100">
+      <tr>
+        <th class="px-5 py-4 text-left text-lg font-bold">Batch Name</th>
+        <th class="px-5 py-4 text-left text-lg font-bold">Product</th>
+        <th class="px-5 py-4 text-left text-lg font-bold">Quantity</th>
+        <th class="px-5 py-4 text-left text-lg font-bold">Cost</th>
+        <th class="px-5 py-4 text-left text-lg font-bold">Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @batches.each_with_index do |b, i| %>
+        <tr class="border-t <%= i.even? ? 'bg-white' : 'bg-gray-50' %>">
+          <td class="px-5 py-4 text-lg font-bold"><%= b.batch_name %></td>
+          <td class="px-5 py-4 text-lg"><%= b.product_name %></td>
+          <td class="px-5 py-4 text-lg"><%= b.quantity_produced_liters %> L</td>
+          <td class="px-5 py-4 text-lg">₹<%= number_with_delimiter(b.production_cost.to_f.round(0)) %></td>
+          <td class="px-5 py-4"><%= status_badge(b.batch_status) %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+  <% if @batches.empty? %>
+    <div class="p-10 text-center text-xl text-gray-500">No production batches for this date.</div>
+  <% end %>
+</div>
+<div class="flex gap-4">
+  <%= link_to "← Back to Reports", reports_path, class: "bg-gray-500 text-white font-bold px-6 py-3 rounded-lg text-lg" %>
+  <button onclick="window.print()" class="bg-blue-600 text-white font-bold px-6 py-3 rounded-lg text-lg">🖨️ Print</button>
+</div>

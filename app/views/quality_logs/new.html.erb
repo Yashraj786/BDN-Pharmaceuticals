@@ -1,0 +1,87 @@
+<div class="max-w-2xl mx-auto">
+  <h1 class="text-3xl font-black mb-2">🔬 Quality Check</h1>
+  <div class="bg-blue-50 border-2 border-blue-300 rounded-xl p-4 mb-6">
+    <p class="text-xl font-bold text-blue-800"><%= @batch.batch_name %> — <%= @batch.product_name %></p>
+    <p class="text-lg text-gray-700"><%= @batch.quantity_produced_liters %> Liters · Produced: <%= @batch.batch_date&.strftime("%d %b %Y") %></p>
+  </div>
+
+  <%= form_with model: [@batch, @log], local: true, class: "space-y-6" do |f| %>
+
+    <!-- Color Check -->
+    <div class="bg-white border-2 border-gray-200 rounded-xl p-5">
+      <p class="text-2xl font-bold mb-3">1. Color Check</p>
+      <p class="text-lg text-gray-600 mb-3">Does the product look the correct color?</p>
+      <div class="flex gap-4">
+        <label class="flex items-center gap-3 cursor-pointer bg-green-50 border-2 border-green-300 rounded-xl px-6 py-4 text-xl font-semibold hover:bg-green-100">
+          <%= f.radio_button :color_ok, "1", class: "w-6 h-6" %>
+          ✅ YES — Color is OK
+        </label>
+        <label class="flex items-center gap-3 cursor-pointer bg-red-50 border-2 border-red-300 rounded-xl px-6 py-4 text-xl font-semibold hover:bg-red-100">
+          <%= f.radio_button :color_ok, "0", class: "w-6 h-6" %>
+          ❌ NO — Color is Wrong
+        </label>
+      </div>
+    </div>
+
+    <!-- Smell Check -->
+    <div class="bg-white border-2 border-gray-200 rounded-xl p-5">
+      <p class="text-2xl font-bold mb-3">2. Smell Check</p>
+      <p class="text-lg text-gray-600 mb-3">Does the product smell correct?</p>
+      <div class="flex gap-4">
+        <label class="flex items-center gap-3 cursor-pointer bg-green-50 border-2 border-green-300 rounded-xl px-6 py-4 text-xl font-semibold hover:bg-green-100">
+          <%= f.radio_button :smell_ok, "1", class: "w-6 h-6" %>
+          ✅ YES — Smell is OK
+        </label>
+        <label class="flex items-center gap-3 cursor-pointer bg-red-50 border-2 border-red-300 rounded-xl px-6 py-4 text-xl font-semibold hover:bg-red-100">
+          <%= f.radio_button :smell_ok, "0", class: "w-6 h-6" %>
+          ❌ NO — Smell is Wrong
+        </label>
+      </div>
+    </div>
+
+    <!-- Purity Test -->
+    <div class="bg-white border-2 border-gray-200 rounded-xl p-5">
+      <p class="text-2xl font-bold mb-3">3. Purity Test</p>
+      <p class="text-lg text-gray-600 mb-3">What is the purity test result?</p>
+      <div class="flex gap-4">
+        <label class="flex items-center gap-3 cursor-pointer bg-green-50 border-2 border-green-300 rounded-xl px-6 py-4 text-xl font-semibold hover:bg-green-100">
+          <%= f.radio_button :purity_test, "pass", class: "w-6 h-6" %>
+          ✅ PASS
+        </label>
+        <label class="flex items-center gap-3 cursor-pointer bg-red-50 border-2 border-red-300 rounded-xl px-6 py-4 text-xl font-semibold hover:bg-red-100">
+          <%= f.radio_button :purity_test, "fail", class: "w-6 h-6" %>
+          ❌ FAIL
+        </label>
+      </div>
+    </div>
+
+    <!-- Optional: pH Level -->
+    <div class="bg-gray-50 border-2 border-gray-200 rounded-xl p-5">
+      <p class="text-xl font-bold mb-2">4. pH Level (Optional)</p>
+      <div class="flex gap-4">
+        <label class="flex items-center gap-3 text-lg"><%= f.radio_button :ph_ok, "1" %> ✅ pH OK</label>
+        <label class="flex items-center gap-3 text-lg"><%= f.radio_button :ph_ok, "0" %> ❌ pH Not OK</label>
+        <label class="flex items-center gap-3 text-lg"><%= f.radio_button :ph_ok, "" %> — Skip</label>
+      </div>
+      <div class="mt-3">
+        <%= f.label :ph_level, "pH Value (number)", class: "text-lg font-semibold" %>
+        <%= f.number_field :ph_level, placeholder: "e.g., 7.2", step: "0.1",
+            class: "mt-1 w-40 text-xl p-3 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none" %>
+      </div>
+    </div>
+
+    <!-- Notes -->
+    <div>
+      <%= f.label :notes, "Additional Notes (Optional)", class: "block text-xl font-semibold mb-2" %>
+      <%= f.text_area :notes, rows: 3, placeholder: "Any observations...",
+          class: "w-full text-xl p-4 border-2 border-gray-300 rounded-xl focus:border-blue-500 focus:outline-none" %>
+    </div>
+
+    <div class="flex gap-4 pt-4">
+      <%= f.submit "SUBMIT QUALITY CHECK",
+          class: "flex-1 bg-purple-600 hover:bg-purple-700 text-white text-2xl font-bold py-4 rounded-xl cursor-pointer" %>
+      <%= link_to "CANCEL", quality_logs_path,
+          class: "flex-1 bg-gray-400 hover:bg-gray-500 text-white text-2xl font-bold py-4 rounded-xl text-center" %>
+    </div>
+  <% end %>
+</div>

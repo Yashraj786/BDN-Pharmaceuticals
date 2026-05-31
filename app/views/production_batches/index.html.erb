@@ -1,0 +1,72 @@
+<div class="flex items-center justify-between mb-6">
+  <h1 class="text-3xl font-black text-gray-800">🏭 Production Batches</h1>
+  <%= link_to "+ Start New Batch", new_production_batch_path, class: "bg-blue-600 hover:bg-blue-700 text-white font-bold px-5 py-3 rounded-lg text-xl" %>
+</div>
+
+<!-- FILTER TABS -->
+<div class="flex gap-3 mb-6 flex-wrap">
+  <%= link_to "All Batches", production_batches_path,
+      class: "px-5 py-2 rounded-lg font-bold text-lg #{@filter == 'all' || @filter.blank? ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 border-2'}" %>
+  <%= link_to "Today", production_batches_path(filter: "today"),
+      class: "px-5 py-2 rounded-lg font-bold text-lg #{@filter == 'today' ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 border-2'}" %>
+  <%= link_to "This Week", production_batches_path(filter: "week"),
+      class: "px-5 py-2 rounded-lg font-bold text-lg #{@filter == 'week' ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 border-2'}" %>
+  <%= link_to "In Progress", production_batches_path(status: "in_progress"),
+      class: "px-5 py-2 rounded-lg font-bold text-lg bg-yellow-100 text-yellow-800 border-2" %>
+  <%= link_to "Ready to Sell", production_batches_path(status: "ready_sale"),
+      class: "px-5 py-2 rounded-lg font-bold text-lg bg-green-100 text-green-800 border-2" %>
+</div>
+
+<div class="bg-white rounded-2xl shadow overflow-hidden">
+  <table class="w-full">
+    <thead class="bg-gray-100">
+      <tr>
+        <th class="px-5 py-4 text-left text-lg font-bold">Batch Name</th>
+        <th class="px-5 py-4 text-left text-lg font-bold">Date</th>
+        <th class="px-5 py-4 text-left text-lg font-bold">Product</th>
+        <th class="px-5 py-4 text-left text-lg font-bold">Quantity</th>
+        <th class="px-5 py-4 text-left text-lg font-bold">Cost</th>
+        <th class="px-5 py-4 text-left text-lg font-bold">Expected Profit</th>
+        <th class="px-5 py-4 text-left text-lg font-bold">Status</th>
+        <th class="px-5 py-4 text-left text-lg font-bold">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @batches.each_with_index do |b, i| %>
+        <tr class="border-t <%= i.even? ? 'bg-white' : 'bg-gray-50' %> hover:bg-blue-50">
+          <td class="px-5 py-4 text-lg font-bold"><%= b.batch_name %></td>
+          <td class="px-5 py-4 text-lg"><%= b.batch_date&.strftime("%d %b %Y") %></td>
+          <td class="px-5 py-4 text-lg"><%= b.product_name %></td>
+          <td class="px-5 py-4 text-lg"><%= b.quantity_produced_liters %> L</td>
+          <td class="px-5 py-4 text-lg">₹<%= number_with_delimiter(b.production_cost.to_f.round(0)) %></td>
+          <td class="px-5 py-4 text-lg <%= b.profit >= 0 ? 'text-green-700' : 'text-red-700' %> font-bold">
+            ₹<%= number_with_delimiter(b.profit.round(0)) %>
+          </td>
+          <td class="px-5 py-4"><%= status_badge(b.batch_status) %></td>
+          <td class="px-5 py-4">
+            <div class="flex gap-2 flex-wrap">
+              <!-- STATUS UPDATE FORM -->
+              <%= form_with url: update_status_production_batch_path(b), method: :patch, local: true, class: "inline" do |f| %>
+                <%= f.select :batch_status, ProductionBatch::STATUSES.map { |s| [s.humanize, s] },
+                    { selected: b.batch_status },
+                    class: "text-base p-2 border-2 border-gray-300 rounded-lg bg-white" %>
+                <%= f.submit "Update", class: "bg-blue-500 hover:bg-blue-600 text-white font-bold px-3 py-2 rounded-lg text-base cursor-pointer" %>
+              <% end %>
+              <% if b.batch_status == "quality_checked" %>
+                <%= button_to "✅ Mark Ready", mark_ready_production_batch_path(b), method: :patch,
+                    class: "bg-green-600 hover:bg-green-700 text-white font-bold px-4 py-2 rounded-lg text-base" %>
+              <% end %>
+              <% if b.batch_status == "completed" && b.quality_log.nil? %>
+                <%= link_to "🔬 Quality Check", new_production_batch_quality_log_path(b),
+                    class: "bg-purple-600 hover:bg-purple-700 text-white font-bold px-4 py-2 rounded-lg text-base" %>
+              <% end %>
+            </div>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+  <% if @batches.empty? %>
+    <div class="p-10 text-center text-xl text-gray-500">No batches found. Click "+ Start New Batch" to begin.</div>
+  <% end %>
+</div>
