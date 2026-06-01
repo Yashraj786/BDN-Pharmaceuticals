@@ -1,7 +1,7 @@
 class CreateQualityLogs < ActiveRecord::Migration[7.2]
   def change
     create_table :quality_logs do |t|
-      t.integer :batch_id
+      t.integer :production_batch_id
       t.decimal :ph_level
       t.decimal :density
       t.boolean :color_ok
